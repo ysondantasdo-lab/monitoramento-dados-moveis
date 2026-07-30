@@ -1,5 +1,5 @@
-package com.example.mobiledatamonitor
-// ⚠️ Pacote não encontrado em build.gradle existente -> usando padrão "com.example.mobiledatamonitor".
+package com.ysondantas.monitordados
+// ⚠️ Pacote não encontrado em build.gradle existente -> usando padrão "com.ysondantas.monitordados".
 // Se seu projeto já tiver outro applicationId/namespace, apenas troque esta linha
 // (e o "package=" do AndroidManifest.xml) para o nome real do seu projeto.
 
