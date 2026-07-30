@@ -1,0 +1,18 @@
+workflows:
+  android-release:
+    name: Android Release Build
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      android_ndk: 26.1.10909125
+      java: 17
+    scripts:
+      - name: Set up local.properties
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Build Android App Bundle (AAB)
+        script: |
+          chmod +x gradlew
+          ./gradlew bundleRelease
+    artifacts:
+      - app/build/outputs/bundle/release/*.aab
