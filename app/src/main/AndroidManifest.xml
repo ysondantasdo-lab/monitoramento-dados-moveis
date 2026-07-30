@@ -298,6 +298,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------- Log de falhas via MediaStore (Download/Errodadosmoveis) ----------
+
     private fun writeLog(context: Context, message: String) {
         try {
             val timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
@@ -305,14 +306,17 @@ class MainActivity : AppCompatActivity() {
 
             val resolver = context.contentResolver
             val fileName = "log_erros_moveis.txt"
-            val relativePath = "Download/Errodadosmoveis/"
+            
+            // CORREÇÃO: Removida a barra final para total compatibilidade com Android 14/15
+            val relativePath = "Download/Errodadosmoveis" 
             val collection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
 
-            // Verifica se o arquivo já existe nessa pasta pública
             var existingUri: Uri? = null
             val projection = arrayOf(MediaStore.MediaColumns._ID)
-            val selection = "${MediaStore.MediaColumns.DISPLAY_NAME} = ? AND ${MediaStore.MediaColumns.RELATIVE_PATH} = ?"
-            val selectionArgs = arrayOf(fileName, relativePath)
+            
+            // CORREÇÃO: Ajustado o filtro de busca retirando a barra de validação
+            val selection = "${MediaStore.MediaColumns.DISPLAY_NAME} = ? AND ${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ?"
+            val selectionArgs = arrayOf(fileName, "Download/Errodadosmoveis%")
 
             resolver.query(collection, projection, selection, selectionArgs, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -331,7 +335,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             targetUri?.let { uri ->
-                // Modo "wa" = write + append -> nunca sobrescreve o conteúdo anterior
                 resolver.openOutputStream(uri, "wa")?.use { stream ->
                     stream.write(logLine.toByteArray())
                 }
@@ -340,4 +343,5 @@ class MainActivity : AppCompatActivity() {
             Log.e("MainActivity", "Erro ao gravar log em MediaStore", e)
         }
     }
+
 }
