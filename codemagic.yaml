@@ -9,6 +9,9 @@ workflows:
       - name: Set up local.properties
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - name: Install Gradle Wrapper
+        script: |
+          gradle wrapper --gradle-version 8.4
       - name: Build Android App Bundle (AAB)
         script: |
           chmod +x gradlew
