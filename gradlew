@@ -21,7 +21,7 @@ while [ -h "$PRG" ] ; do
 done
 
 APP_BASE_NAME=`basename "$0"`
-APP_HOME=`cwd=pwd; cd \`dirname "$PRG"\` >/dev/null; pwd; cd "$cwd" >/dev/null`
+APP_HOME="$(cd "$(dirname "$PRG")" && pwd)"
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
