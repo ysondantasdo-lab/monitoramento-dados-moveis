@@ -1,0 +1,2 @@
+rootProject.name = "MobileDataMonitor"
+include ':app'
