@@ -318,11 +318,6 @@ class MainActivity : AppCompatActivity() {
 
 
     // ---------- Log de falhas via MediaStore (Download/Errodadosmoveis) ----------
-        // Adicione as duas funções de classificação AQUI, logo antes do writeLog:
-    
-        // --- FUNÇÕES AUXILIARES DE CLASSIFICAÇÃO DE SINAL ---
-
-        // --- FUNÇÕES AUXILIARES DE CLASSIFICAÇÃO DE SINAL ---
 
     // Função auxiliar para classificar a força do sinal (dBm)
     private fun getSignalStrengthLabel(dbm: Int?): String {
