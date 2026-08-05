@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvCellInfo: TextView
     private lateinit var tvSignal: TextView
     private lateinit var tvSpeed: TextView
+    private lateinit var tvLogPath: TextView // 🆕 Adicione esta linha aqui
 
     // ---------- Controle de atualização ----------
     private val handler = Handler(Looper.getMainLooper())
@@ -105,11 +106,19 @@ class MainActivity : AppCompatActivity() {
             textSize = 18f
             setPadding(0, 0, 0, 24)
         }
+        tvLogPath = TextView(this).apply {
+            textSize = 14f
+            setPadding(0, 60, 0, 0) // Espaçamento maior para ficar no rodapé da tela
+            text = "📁 Histórico salvo em:\nArmazenamento Interno > Download > Errodadosmoveis > log_erros_moveis.txt"
+        }
+
+        
 
         root.addView(tvStatus)
         root.addView(tvCellInfo)
         root.addView(tvSignal)
         root.addView(tvSpeed)
+        root.addView(tvLogPath) // 🆕 Adiciona o campo informativo ao layout da tela
         return root
     }
 
