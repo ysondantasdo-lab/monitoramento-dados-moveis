@@ -206,28 +206,32 @@ class MainActivity : AppCompatActivity() {
             var cellId: Int? = null
             var tac: Int? = null
             var dbm: Int? = null
+            var sinr: Int? = null // Nova métrica crucial para o diagnóstico
             var typeLabel = "Desconhecido"
 
             when (registeredCell) {
-                is CellInfoLte -> {
-                    cellId = registeredCell.cellIdentity.ci
-                    tac = registeredCell.cellIdentity.tac
-                    dbm = registeredCell.cellSignalStrength.dbm
-                    typeLabel = "LTE (4G)"
+                is CellInfoNr -> { // 5G Nativo (Sem Reflection)
+                    val identity = registeredCell.cellIdentity as android.telephony.CellIdentityNr
+                    val ss = registeredCell.cellSignalStrength as android.telephony.CellSignalStrengthNr
+                    
+                    dbm = ss.dbm
+                    sinr = if (ss.ssSinr != android.telephony.CellInfo.UNAVAILABLE) ss.ssSinr else null
+                    typeLabel = "NR (5G)"
+                    
+                    tac = if (identity.tac != android.telephony.CellInfo.UNAVAILABLE) identity.tac else null
+                    val nci = identity.nci
+                    cellId = if (nci != android.telephony.CellInfo.UNAVAILABLE_LONG) (nci and 0xFFFFFFF).toInt() else null
                 }
-                is CellInfoNr -> {
+                is CellInfoLte -> { // 4G LTE com ruído de sinal
                     val identity = registeredCell.cellIdentity
                     val ss = registeredCell.cellSignalStrength
+                    
                     dbm = ss.dbm
-                    typeLabel = "NR (5G)"
-                    // CellIdentityNr expõe nci/tac via toString em algumas versões;
-                    // usamos hashCode como fallback caso os getters não estejam disponíveis.
-                    tac = try {
-                        identity.javaClass.getMethod("getTac").invoke(identity) as? Int
-                    } catch (e: Exception) { null }
-                    cellId = try {
-                        (identity.javaClass.getMethod("getNci").invoke(identity) as? Long)?.toInt()
-                    } catch (e: Exception) { null }
+                    sinr = if (ss.rssnr != android.telephony.CellInfo.UNAVAILABLE) ss.rssnr else null
+                    typeLabel = "LTE (4G)"
+                    
+                    tac = if (identity.tac != android.telephony.CellInfo.UNAVAILABLE) identity.tac else null
+                    cellId = if (identity.ci != android.telephony.CellInfo.UNAVAILABLE) identity.ci else null
                 }
                 is CellInfoWcdma -> {
                     cellId = registeredCell.cellIdentity.cid
@@ -242,6 +246,7 @@ class MainActivity : AppCompatActivity() {
                     typeLabel = "GSM (2G)"
                 }
             }
+
 
             tvCellInfo.text = "Antena [$typeLabel]: Cell ID = ${cellId ?: "--"} | TAC/LAC = ${tac ?: "--"}"
             tvSignal.text = "Sinal: ${dbm ?: "--"} dBm"
@@ -298,6 +303,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------- Log de falhas via MediaStore (Download/Errodadosmoveis) ----------
+        // Adicione as duas funções de classificação AQUI, logo antes do writeLog:
+    
+    // Função auxiliar para classificar a força do sinal (dBm)
+    private fun getSignalStrengthLabel(dbm: Int?): String {
+        if (dbm == null || dbm == -999) return "Sem Sinal"
+        return when {
+            dbm >= -85 -> "Excelente 🟢"
+            dbm >= -95 -> "Bom 🟡"
+            dbm >= -105 -> "Regular 🟠"
+            else -> "Ruim 🔴"
+        }
+    }
+
+    // Função auxiliar para classificar a qualidade/ruído do sinal (SINR)
+    private fun getSignalQualityLabel(sinr: Int?): String {
+        if (sinr == null) return ""
+        return when {
+            sinr >= 13 -> " (Limpo ✨)"
+            sinr >= 5  -> " (Normal 👍)"
+            sinr >= 0  -> " (Instável ⚠️)"
+            else       -> " (Muita Interferência 🛑)"
+        }
+    }
+
+    // ---------- Log de falhas via MediaStore (Download/Errodadosmoveis) ----------
+    private fun writeLog(context: Context, message: String) {
+        try {
+            val timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+            // ... (resto do seu código original do writeLog que você enviou)
+
+    
     private fun writeLog(context: Context, message: String) {
         try {
             val timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
