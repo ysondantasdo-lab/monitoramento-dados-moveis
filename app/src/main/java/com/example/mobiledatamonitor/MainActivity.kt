@@ -320,6 +320,8 @@ class MainActivity : AppCompatActivity() {
     // ---------- Log de falhas via MediaStore (Download/Errodadosmoveis) ----------
         // Adicione as duas funções de classificação AQUI, logo antes do writeLog:
     
+    // --- FUNÇÕES AUXILIARES DE CLASSIFICAÇÃO DE SINAL ---
+
     // Função auxiliar para classificar a força do sinal (dBm)
     private fun getSignalStrengthLabel(dbm: Int?): String {
         if (dbm == null || dbm == -999) return "Sem Sinal"
@@ -343,12 +345,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------- Log de falhas via MediaStore (Download/Errodadosmoveis) ----------
-    private fun writeLog(context: Context, message: String) {
-        try {
-            val timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
-            // ... (resto do seu código original do writeLog que você enviou)
-
-    
     private fun writeLog(context: Context, message: String) {
         try {
             val timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
@@ -392,3 +388,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
