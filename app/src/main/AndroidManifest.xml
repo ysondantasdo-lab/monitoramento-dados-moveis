@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Permissões Obrigatórias -->
     <!-- Necessária para ler CellInfo (Cell ID / TAC / dBm) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- Necessária para ler estado da rede celular (TelephonyManager) -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!-- Necessária para verificar se a conexão ativa é Wi-Fi ou Móvel -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Boa prática incluir para ferramentas de monitoramento de tráfego -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 🆕 Exigência do Google Play: Declara que o GPS físico não é obrigatório para rodar o app -->
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
     <application
         android:allowBackup="true"
