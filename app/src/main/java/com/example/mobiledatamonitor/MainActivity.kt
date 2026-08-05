@@ -301,15 +301,21 @@ class MainActivity : AppCompatActivity() {
 
         tvSpeed.text = "Velocidade: %.1f KB/s ↓ / %.1f KB/s ↑".format(downloadKBs, uploadKBs)
 
-        // Log: velocidade zerada (sem qualquer tráfego no intervalo, com sinal presente)
-        if (downloadKBs <= 0.0 && uploadKBs <= 0.0) {
-            writeLog(this, "Velocidade zerada (0 KB/s em download e upload)")
+        // 🛑 NOVA LÓGICA DE TELECOM: DETECTAR TRAVAMENTO LÓGICO (DATA STALLING)
+        // Se o download está zerado, mas o sinal de rede está ativo (wasSignalOk) E 
+        // existe alguma atividade de upload (txDiff > 0), significa que o seu S24 está tentando 
+        // transmitir pacotes para a Claro, mas a rede não está respondendo com dados de volta.
+        if (downloadKBs <= 0.0) {
+            if (wasSignalOk && txDiff > 0) {
+                writeLog(this, "🚨 DATA STALLING: Upload enviando pacotes ($txDiff bytes), mas rede Claro retornou 0 KB/s de Download. Antena ativa: $lastCellId")
+            }
         }
 
         lastRxBytes = currentRx
         lastTxBytes = currentTx
         lastTimestamp = now
     }
+
 
     // ---------- Log de falhas via MediaStore (Download/Errodadosmoveis) ----------
         // Adicione as duas funções de classificação AQUI, logo antes do writeLog:
