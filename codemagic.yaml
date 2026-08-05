@@ -4,6 +4,8 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
+      groups:
+        - keystore_credentials
       java: 17
     scripts:
       - name: Set up local.properties
@@ -14,23 +16,23 @@ workflows:
           gradle wrapper --gradle-version 8.4
       - name: Create and Inject Release Keystore
         script: |
-          # Gera uma chave digital de produção válida em tempo de execução
+          # Gera uma chave digital de produção válida em tempo de execução usando as variáveis do painel
           keytool -genkeypair \
             -v \
-            -keystore app/release.keystore \
-            -alias monitordados \
+            -keystore "app/$CM_KEYSTORE_PATH" \
+            -alias "$CM_KEY_ALIAS" \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
-            -storepass "SenhaSegura123" \
-            -keypass "SenhaSegura123" \
+            -storepass "$CM_KEYSTORE_PASSWORD" \
+            -keypass "$CM_KEYSTORE_PASSWORD" \
             -dname "CN=ysondantas, OU=Development, O=DantasLab, L=Goiania, S=Goias, C=BR"
           
           # Injeta os dados da nova chave diretamente na configuração de build do aplicativo
-          echo "RELEASE_STORE_FILE=release.keystore" >> app/gradle.properties
-          echo "RELEASE_STORE_PASSWORD=SenhaSegura123" >> app/gradle.properties
-          echo "RELEASE_KEY_ALIAS=monitordados" >> app/gradle.properties
-          echo "RELEASE_KEY_PASSWORD=SenhaSegura123" >> app/gradle.properties
+          echo "RELEASE_STORE_FILE=$CM_KEYSTORE_PATH" >> app/gradle.properties
+          echo "RELEASE_STORE_PASSWORD=$CM_KEYSTORE_PASSWORD" >> app/gradle.properties
+          echo "RELEASE_KEY_ALIAS=$CM_KEY_ALIAS" >> app/gradle.properties
+          echo "RELEASE_KEY_PASSWORD=$CM_KEYSTORE_PASSWORD" >> app/gradle.properties
       - name: Build Android App Bundle (AAB)
         script: |
           chmod +x gradlew
