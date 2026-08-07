@@ -19,10 +19,7 @@ workflows:
           # 1. Reconstrói o arquivo físico usando o texto Base64 do painel
           echo "$CM_KEYSTORE_BASE64" | base64 --decode > "app/$CM_KEY_PATH"
           
-          # 2. EXTRAÇÃO TEMPORÁRIA: Linha adicionada para gerar o certificado público do Google
-          keytool -export -rfc -keystore "app/$CM_KEY_PATH" -alias "$CM_KEY_ALIAS" -storepass "$CM_KEY_PASSWORD" -file "app/upload_certificate.pem"
-          
-          # 3. Injeta os dados da sua chave definitiva no gradle.properties
+          # 2. Injeta os dados da sua chave definitiva no gradle.properties
           echo "RELEASE_STORE_FILE=$CM_KEY_PATH" >> app/gradle.properties
           echo "RELEASE_STORE_PASSWORD=$CM_KEY_PASSWORD" >> app/gradle.properties
           echo "RELEASE_KEY_ALIAS=$CM_KEY_ALIAS" >> app/gradle.properties
@@ -33,4 +30,3 @@ workflows:
           ./gradlew bundleRelease
     artifacts:
       - app/build/outputs/bundle/release/*.aab
-      - app/upload_certificate.pem # Linha adicionada para liberar o download do arquivo .pem
