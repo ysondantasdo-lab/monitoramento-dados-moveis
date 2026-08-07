@@ -14,25 +14,16 @@ workflows:
       - name: Install Gradle Wrapper
         script: |
           gradle wrapper --gradle-version 8.4
-      - name: Create and Inject Release Keystore
+      - name: Decrypt and Inject Release Keystore
         script: |
-          # Gera uma chave digital de produção válida em tempo de execução usando as variáveis do painel
-          keytool -genkeypair \
-            -v \
-            -keystore "app/$CM_KEYSTORE_PATH" \
-            -alias "$CM_KEY_ALIAS" \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass "$CM_KEYSTORE_PASSWORD" \
-            -keypass "$CM_KEYSTORE_PASSWORD" \
-            -dname "CN=ysondantas, OU=Development, O=DantasLab, L=Goiania, S=Goias, C=BR"
+          # 1. Reconstrói o arquivo físico monitor_dados_upload.keystore usando o texto Base64 do painel
+          echo "$CM_KEYSTORE_BASE64" | base64 --decode > "app/$CM_KEY_PATH"
           
-          # Injeta os dados da nova chave diretamente na configuração de build do aplicativo
-          echo "RELEASE_STORE_FILE=$CM_KEYSTORE_PATH" >> app/gradle.properties
-          echo "RELEASE_STORE_PASSWORD=$CM_KEYSTORE_PASSWORD" >> app/gradle.properties
+          # 2. Injeta os dados da sua chave definitiva no gradle.properties com os nomes esperados pelo build.gradle
+          echo "RELEASE_STORE_FILE=$CM_KEY_PATH" >> app/gradle.properties
+          echo "RELEASE_STORE_PASSWORD=$CM_KEY_PASSWORD" >> app/gradle.properties
           echo "RELEASE_KEY_ALIAS=$CM_KEY_ALIAS" >> app/gradle.properties
-          echo "RELEASE_KEY_PASSWORD=$CM_KEYSTORE_PASSWORD" >> app/gradle.properties
+          echo "RELEASE_KEY_PASSWORD=$CM_KEY_PASSWORD" >> app/gradle.properties
       - name: Build Android App Bundle (AAB)
         script: |
           chmod +x gradlew
